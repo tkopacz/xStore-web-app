@@ -38,8 +38,8 @@ jobs:
     - name: Test
       run: dotnet test ./Application/ --no-build --verbosity normal
   
-  push-image:
-    name: Prepare and push image to ACR
+  deploy:
+    name: Push image and deploy to AKS
     needs: [build]
     runs-on: ubuntu-latest
   
@@ -65,18 +65,7 @@ jobs:
         docker build "$GITHUB_WORKSPACE/Application" -f  "Application/Dockerfile" -t ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
         docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
  
-  deploy:
-    name: Deploy application to AKS
-    needs: [push-image]
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    # login to azure
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+  
 
     - name: Get AKS Credentials
       id: getContext
