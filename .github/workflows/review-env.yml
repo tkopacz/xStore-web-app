@@ -1,4 +1,4 @@
-name: CI
+name: Provision Review Environment
 
 on:
   push:
