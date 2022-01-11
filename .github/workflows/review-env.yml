@@ -121,6 +121,15 @@ jobs:
           ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
         imagepullsecrets: |
           ${{ env.CLUSTERNAME }}dockerauth
+          
+    - name: Get app external IP 
+      id: getIngressExternalIP
+      run: |
+           echo "::set-output name=app_external_ip::`kubectl -n ${{ env.NAMESPACE }} get svc sampleapp -o json | jq .status.loadBalancer.ingress[0].ip | xargs`"
+     
+    environment:
+      name: Ready for review
+      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
 
         
   Ready:
@@ -128,7 +137,7 @@ jobs:
     needs: [deploy]
     runs-on: ubuntu-latest
     environment:
-      name: Ready for review
+      name: Temp-Test
       url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
     steps:
     - name : Cleanup
