@@ -61,6 +61,10 @@ jobs:
   deploy:
     name: Deploy application to AKS
     needs: build
+    environment:
+      name: test
+      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
+
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -125,12 +129,8 @@ jobs:
     - name: Get app external IP 
       id: getIngressExternalIP
       run: |
-           echo "::set-output name=app_external_ip::`kubectl -n ${{ env.NAMESPACE }} get svc sampleapp -o json | jq .status.loadBalancer.ingress[0].ip | xargs`"
+           echo "::set-output name=app_external_ip::http://`kubectl -n ${{ env.NAMESPACE }} get svc sampleapp -o json | jq .status.loadBalancer.ingress[0].ip | xargs`"
      
-    environment:
-      name: Ready for review
-      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
-
         
   Ready:
     name: Ready for review
@@ -140,7 +140,6 @@ jobs:
       name: Temp-Test
       url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
     steps:
-    - name : Cleanup
+    - name : Done
       run: | 
-        az logout
-        rm -rf $GITHUB_WORKSPACE/kubeconfig
+       echo Done
