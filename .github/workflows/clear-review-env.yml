@@ -1,0 +1,38 @@
+name: Clean-up review env
+
+on:
+#  pull_request:
+#    types: [closed]
+  
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+env:
+  RESOURCEGROUPNAME: "rg-norxstore-system"
+  CLUSTERNAME: "k8s-xstore-cluster"
+  HTTPSAPPLICATIONROUTINGENABLED: false
+  NAMESPACE: "xstore-${{ github.ref_name }}"
+
+jobs:
+  clean-up:
+    name: Clean-up review environment
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    
+   
+    # login to azure
+    - name: Login to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Get AKS Credentials
+      id: getContext
+      run: |
+          az aks get-credentials --resource-group ${{ env.RESOURCEGROUPNAME }} --name ${{ env.CLUSTERNAME }} --file $GITHUB_WORKSPACE/kubeconfig
+          echo "KUBECONFIG=$GITHUB_WORKSPACE/kubeconfig" >> $GITHUB_ENV
+    
+    - name: Remove review namespace
+      run: |
+        kubectl delete ns ${{ env.NAMESPACE }}
+      
