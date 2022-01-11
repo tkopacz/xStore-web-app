@@ -121,10 +121,7 @@ jobs:
           ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
         imagepullsecrets: |
           ${{ env.CLUSTERNAME }}dockerauth
-    - name : Cleanup
-      run: | 
-        az logout
-        rm -rf $GITHUB_WORKSPACE/kubeconfig
+
         
   Ready:
     name: Ready for review
@@ -133,3 +130,8 @@ jobs:
     environment:
       name: Ready for review
       url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
+    steps:
+    - name : Cleanup
+      run: | 
+        az logout
+        rm -rf $GITHUB_WORKSPACE/kubeconfig
