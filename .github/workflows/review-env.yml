@@ -125,6 +125,11 @@ jobs:
       run: | 
         az logout
         rm -rf $GITHUB_WORKSPACE/kubeconfig
+        
+  Ready:
+    name: Ready for review
+    needs: [deploy]
+    runs-on: ubuntu-latest
     environment:
       name: Ready for review
       url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
