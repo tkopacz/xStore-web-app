@@ -37,7 +37,13 @@ jobs:
       run: dotnet build ./Application/ --no-restore
     - name: Test
       run: dotnet test ./Application/ --no-build --verbosity normal
-
+  
+  push-container:
+    name: Prepare and push container to ACR
+    needs: [build]
+    runs-on: ubuntu-latest
+  
+    steps:
     # login to azure
     - name: Login to Azure
       uses: azure/login@v1
@@ -61,7 +67,7 @@ jobs:
  
   deploy:
     name: Deploy application to AKS
-    needs: build
+    needs: [push-container]
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -125,6 +131,25 @@ jobs:
           ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
         imagepullsecrets: |
           ${{ env.CLUSTERNAME }}dockerauth
+          
+    - name: Get app external IP 
+      id: getIngressExternalIP
+      run: |
+           echo "::set-output name=app_external_ip::`kubectl -n ${{ env.NAMESPACE }} get svc sampleapp -o json | jq .status.loadBalancer.ingress[0].ip | xargs`"
+
+          
+    environment:
+      name: Development
+      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
+          
+  expose-test-env:
+    name: Access prepare test environment
+    needs: [deploy]
+    environment:
+      name: Test environment for internal review
+      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
+    runs-on: ubuntu-latest
+    steps:
 
     - name : Cleanup
       run: | 
