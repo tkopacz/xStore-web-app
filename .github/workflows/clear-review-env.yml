@@ -1,8 +1,8 @@
 name: Clean-up review env
 
 on:
-#  pull_request:
-#    types: [closed]
+  pull_request:
+    types: [closed]
   
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -14,6 +14,7 @@ env:
 
 jobs:
   clean-up:
+    if: ${{ github.event.label.name == 'requires-review-env' }}
     name: Clean-up review environment
     runs-on: ubuntu-latest
     steps:
