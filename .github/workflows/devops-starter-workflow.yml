@@ -7,7 +7,7 @@ on:
 env:
   RESOURCEGROUPNAME: "rg-norxstore-system"
   LOCATION: "North Europe"
-  SUBSCRIPTIONID: "58e1f081-0003-43c1-9661-8ba9770ab160"
+  SUBSCRIPTIONID: ${{ secret.SUBSCRIPTION_ID }}
   IMAGENAME: "k8sxstorecluster0694"
   REGISTRYSKU: "Standard"
   REGISTRYNAME: "xstorewebappacr"
