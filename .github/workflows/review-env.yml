@@ -15,20 +15,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      
-      - uses: actions/github-script@v5
-        with:
-          script: |
-            const script = require('./path/to/script.js')
-            console.log(script({github, context}))
-            const fs = require('fs')
-            const ev = JSON.parse(
-              fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')
-            )
-            const prNum = ev.pull_request.number
-            console.log(prNum)
-            echo prNum
-
+           
+      - name: Run a one-line script
+        run: echo ${{ github.ref_name }}
+        
       # Runs a single command using the runners shell
       - name: Run a one-line script
         run: echo Hello, world!
