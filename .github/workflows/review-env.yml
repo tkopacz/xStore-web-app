@@ -131,15 +131,3 @@ jobs:
       run: |
            echo "::set-output name=app_external_ip::http://`kubectl -n ${{ env.NAMESPACE }} get svc sampleapp -o json | jq .status.loadBalancer.ingress[0].ip | xargs`"
      
-        
-  Ready:
-    name: Ready for review
-    needs: [deploy]
-    runs-on: ubuntu-latest
-    environment:
-      name: Temp-Test
-      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
-    steps:
-    - name : Done
-      run: | 
-       echo Done
