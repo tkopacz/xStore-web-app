@@ -125,3 +125,6 @@ jobs:
       run: | 
         az logout
         rm -rf $GITHUB_WORKSPACE/kubeconfig
+    environment:
+      name: Ready for review
+      url: ${{ steps.getIngressExternalIP.outputs.app_external_ip }}
