@@ -17,6 +17,14 @@ jobs:
       - uses: actions/checkout@v1
 
       - name : Provision Infra
+        id: provisionInfra
+        run: | 
+          echo 'App deployed'
+          echo "::set-output name=subscription_id:: 48dsa-12dsa-123dsa-213a"
+          echo "::set-output name=resource_group:: xstore-ondemand-${{ github.actor }}-${{ github.event.issue.number }}"
+          echo "::set-output name=K8s_cluster_name:: xstore-k8scluster-ondemand-${{ github.actor }}-${{ github.event.issue.number }}"
+          
+      - name : Provision Infra
         run: | 
           echo 'App deployed'
           
@@ -26,5 +34,9 @@ jobs:
           issue-number: ${{ github.event.issue.number }}
           body: |
             ### 🚀All Set! 🚀
-            Check your Azure Subscription for Resource Group: XXXXX*
+            Check your resources
+            Azure Subscription: *${{ steps.provisionInfra.outputs.subscription_id}}*
+            Resource Group: *${{ steps.provisionInfra.outputs.resource_group}}*
+            Kubernetes Cluster Name: *${{ steps.provisionInfra.outputs.K8s_cluster_name}}*
+            Number of nodes: 3
           reaction-type: hooray
