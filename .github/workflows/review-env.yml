@@ -1,11 +1,8 @@
-name: Create env for internal review 
+name: DeployApp for Review 
 
 on:
-  push:
-    branches: [ create-env-on-pullrequest ]
-
-#  pull_request:
-#    branches: [ main ]
+  pull_request:
+    types: [labeled]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -22,6 +19,7 @@ env:
 
 jobs:
   build:
+    if: ${{ github.event.label.name == 'requires-review-env' }}
     name: Build and push image to container registry
     runs-on: ubuntu-latest
     steps:
@@ -59,6 +57,7 @@ jobs:
         docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
  
   deploy:
+    if: ${{ github.event.label.name == 'requires-review-env' }}
     name: Deploy application to AKS
     needs: build
     environment:
