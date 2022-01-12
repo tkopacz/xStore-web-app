@@ -10,7 +10,7 @@ env:
   RESOURCEGROUPNAME: "rg-norxstore-system"
   CLUSTERNAME: "k8s-xstore-cluster"
   HTTPSAPPLICATIONROUTINGENABLED: false
-  NAMESPACE: "xstore-${{ github.ref_name }}"
+  NAMESPACE: "xstore-${{ github.head_ref }}"
 
 jobs:
   clean-up:
