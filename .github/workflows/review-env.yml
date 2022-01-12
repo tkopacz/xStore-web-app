@@ -15,7 +15,7 @@ env:
   CLUSTERNAME: "k8s-xstore-cluster"
   HTTPSAPPLICATIONROUTINGENABLED: false
   KUBERNETESAPI: "apps/v1"
-  NAMESPACE: "xstore-${{ github.ref_name }}"
+  NAMESPACE: "xstore-${{ github.base_ref }}"
 
 jobs:
   build:
