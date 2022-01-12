@@ -1,0 +1,30 @@
+name: Provision Infra on User Request 
+on:
+  issues:
+    types: [labeled]
+
+  workflow_dispatch:
+
+
+jobs:
+
+  build:
+    if: ${{ contains(github.event.issue.title, '[ENV]') && github.event.label.name == 'approved' }}
+    
+    name: EnvironmentCreation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name : Provision Infra
+        run: | 
+          echo 'App deployed'
+          
+      - uses: peter-evans/create-or-update-comment@v1.4.5
+        with:
+          token: ${{ github.token }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### 🚀All Set! 🚀
+            Check your Azure Subscription for Resource Group: XXXXX*
+          reaction-type: hooray
