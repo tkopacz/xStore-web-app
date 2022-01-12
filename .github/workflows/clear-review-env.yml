@@ -14,7 +14,7 @@ env:
 
 jobs:
   clean-up:
-    if: ${{ github.event.label.name == 'requires-review-env' }}
+    if: contains(github.event.pull_request.labels.*.name, 'requires-review-env')
     name: Clean-up review environment
     runs-on: ubuntu-latest
     steps:
