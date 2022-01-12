@@ -1,11 +1,8 @@
 name: DeployApp for Review 
 
 on:
-  push:
-    branches: [ create-env-on-pullrequest ]
-
-#  pull_request:
-#    branches: [ main ]
+  pull_request:
+    types: [labeled]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,10 +15,11 @@ env:
   CLUSTERNAME: "k8s-xstore-cluster"
   HTTPSAPPLICATIONROUTINGENABLED: false
   KUBERNETESAPI: "apps/v1"
-  NAMESPACE: "xstore-${{ github.ref_name }}"
+  NAMESPACE: "xstore-${{ github.head_ref }}"
 
 jobs:
   build:
+    if: ${{ github.event.label.name == 'requires-review-env' }}
     name: Build and push image to container registry
     runs-on: ubuntu-latest
     steps:
@@ -55,10 +53,11 @@ jobs:
       run: |
         echo "::add-mask::${{ steps.createACR.outputs.acr_password }}"
         docker login ${{ env.REGISTRYNAME }}.azurecr.io --username ${{ steps.createACR.outputs.acr_username }} --password ${{ steps.createACR.outputs.acr_password }}
-        docker build "$GITHUB_WORKSPACE/Application" -f  "Application/Dockerfile" -t ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
-        docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
+        docker build "$GITHUB_WORKSPACE/Application" -f  "Application/Dockerfile" -t ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
+        docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
  
   deploy:
+    if: ${{ github.event.label.name == 'requires-review-env' }}
     name: Deploy application to AKS
     needs: build
     environment:
@@ -109,7 +108,7 @@ jobs:
         overrideFiles: './Application/charts/sampleapp/values.yaml'
         overrides: |
             image.repository:${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}
-            image.tag:${{ github.ref_name }}
+            image.tag:${{ github.sha }}
             imagePullSecrets:{${{ env.CLUSTERNAME }}dockerauth}
             applicationInsights.InstrumentationKey:${{ steps.GetAppInsightsKey.outputs.AIKey }}
             apiVersion:${{ env.KUBERNETESAPI }}
@@ -122,7 +121,7 @@ jobs:
         namespace: ${{ env.NAMESPACE }}
         manifests: ${{ steps.bakeManifests.outputs.manifestsBundle }}
         images: |
-          ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.ref_name }}
+          ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
         imagepullsecrets: |
           ${{ env.CLUSTERNAME }}dockerauth
           
