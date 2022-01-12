@@ -7,7 +7,7 @@ on:
 env:
   RESOURCEGROUPNAME: "rg-norxstore-system"
   LOCATION: "North Europe"
-  SUBSCRIPTIONID: "58e1f081-0003-43c1-9661-8ba9770ab160"
+  SUBSCRIPTIONID: ${{ secrets.SUBSCRIPTION_ID }}
   IMAGENAME: "k8sxstorecluster0694"
   REGISTRYSKU: "Standard"
   REGISTRYNAME: "xstorewebappacr"
@@ -30,7 +30,23 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.x
+    - name: Restore dependencies
+      run: dotnet restore ./Application/
+    - name: Build
+      run: dotnet build ./Application/ --no-restore
+    
+    
+  deploy-to-test:
+    name: Deploy to Test
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+    
     # login to azure
     - name: Login to Azure
       uses: azure/login@v1
@@ -63,19 +79,7 @@ jobs:
         docker build "$GITHUB_WORKSPACE/Application" -f  "Application/Dockerfile" -t ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
         docker push ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
  
-  deploy:
-    name: Deploy application to AKS
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-
-    # login to azure
-    - name: Login to Azure
-      uses: azure/login@v1
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
-
+  
     - name: Get AKS Credentials
       id: getContext
       run: |
@@ -135,7 +139,35 @@ jobs:
           ${{ env.REGISTRYNAME }}.azurecr.io/${{ env.IMAGENAME }}:${{ github.sha }}
         imagepullsecrets: |
           ${{ env.CLUSTERNAME }}dockerauth
-
+          
+  deploy-to-stage:
+    name: Deploy to Stage
+    needs: [deploy-to-test]
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name : Provision Environment Infastructure
+      run: | 
+        echo 'Infrastructure Provisioned'
+        
+    - name : Deploy app to Staging AKS
+      run: | 
+        echo 'App deployed'
+        
+  deploy-to-prod:
+    name: Deploy to Prod
+    needs: [deploy-to-stage]
+    runs-on: ubuntu-latest
+    steps:
+    
+    - name : Provision Environment Infastructure
+      run: | 
+        echo 'Infrastructure Provisioned'
+        
+    - name : Deploy app to Prod AKS
+      run: | 
+        echo 'App deployed'
+        
     - name : Cleanup
       run: | 
         az logout

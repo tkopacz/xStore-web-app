@@ -1,0 +1,44 @@
+name: Environment Request
+description: Submit a request to create a new hosting environment for your app
+title: "[ENV]: "
+labels: ["env-request"]
+assignees:
+  - kstachowicz
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: appname
+    attributes:
+      label: Application name
+      description: What's the name of the service you would like to test? 
+    validations:
+      required: false
+  - type: textarea
+    id: business-justification
+    attributes:
+      label: Business Justification
+      description: Tell us, why do you need seperate infastructure from common dev?
+      placeholder: Tell us why!
+    validations:
+      required: true
+  - type: dropdown
+    id: version
+    attributes:
+      label: Kubernetes version
+      description: What version of our software are you running?
+      options:
+        - 1.19
+        - 1.20 (default)
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: By submitting this issue, you agree to follow our [Code of Conduct](https://example.com)
+      options:
+        - label: I agree to follow this project's Code of Conduct
+          required: true

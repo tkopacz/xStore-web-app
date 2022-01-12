@@ -1,0 +1,42 @@
+name: Provision Infra on User Request 
+on:
+  issues:
+    types: [labeled]
+
+  workflow_dispatch:
+
+
+jobs:
+
+  build:
+    if: ${{ contains(github.event.issue.title, '[ENV]') && github.event.label.name == 'approved' }}
+    
+    name: EnvironmentCreation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name : Provision Infra
+        id: provisionInfra
+        run: | 
+          echo 'App deployed'
+          echo "::set-output name=subscription_id:: 48dsa-12dsa-123dsa-213a"
+          echo "::set-output name=resource_group:: xstore-ondemand-${{ github.actor }}-${{ github.event.issue.number }}"
+          echo "::set-output name=K8s_cluster_name:: xstore-k8scluster-ondemand-${{ github.actor }}-${{ github.event.issue.number }}"
+          
+      - name : Provision Infra
+        run: | 
+          echo 'App deployed'
+          
+      - uses: peter-evans/create-or-update-comment@v1.4.5
+        with:
+          token: ${{ github.token }}
+          issue-number: ${{ github.event.issue.number }}
+          body: |
+            ### 🚀All Set! 🚀
+            Check your resources
+            Azure Subscription: *${{ steps.provisionInfra.outputs.subscription_id}}*
+            Resource Group: *${{ steps.provisionInfra.outputs.resource_group}}*
+            Kubernetes Cluster Name: *${{ steps.provisionInfra.outputs.K8s_cluster_name}}*
+            Number of nodes: 3
+          reaction-type: hooray
