@@ -26,7 +26,7 @@ env:
 
 jobs:
   build:
-    name: Build and push image to container registry
+    name: Deploy to Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
