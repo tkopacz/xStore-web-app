@@ -13,7 +13,8 @@ namespace aspnet_core_dotnet_core.Pages
     
         public void OnGet()
         {
-            TeamMembers = new List<string>() {"John", "Peter", "Mark", "Frank"};
+            var nameList = new List<string>() {"John", "Peter", "Mark", "Frank"};
+            TeamMembers = nameList;
         }
     }
 }
