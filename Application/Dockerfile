@@ -1,5 +1,6 @@
 FROM mcr.microsoft.com/dotnet/core/sdk:3.1-buster AS build-env
 WORKDIR /app
+EXPOSE 5001
 
 # Copy csproj and restore as distinct layers
 COPY /aspnet-core-dotnet-core/*.csproj ./

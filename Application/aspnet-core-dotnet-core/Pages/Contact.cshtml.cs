@@ -9,8 +9,11 @@ namespace aspnet_core_dotnet_core.Pages
 {
     public class ContactModel : PageModel
     {
+        public List<string> TeamMembers {get; set;} 
+    
         public void OnGet()
         {
+            TeamMembers = new List<string>() {"John", "Peter", "Mark", "Frank"};
         }
     }
 }
