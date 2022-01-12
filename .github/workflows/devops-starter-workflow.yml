@@ -41,12 +41,6 @@ jobs:
       run: dotnet build ./Application/ --no-restore
     
     
-  deploy-to-test:
-    name: Deploy to Test
-    needs: [build]
-    runs-on: ubuntu-latest
-    steps:
-    
     # login to azure
     - name: Login to Azure
       uses: azure/login@v1
@@ -142,7 +136,7 @@ jobs:
           
   deploy-to-stage:
     name: Deploy to Stage
-    needs: [deploy-to-test]
+    needs: [build]
     runs-on: ubuntu-latest
     steps:
     
