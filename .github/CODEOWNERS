@@ -1,0 +1,7 @@
+# *                 @devsocietydemo/devs
+# *.js              @bmis
+# /build/logs/      @devsocietydemo/devs
+# docs/*            @docs@example.com
+# apps/             @octocat
+/ClientApp/         @krzyrog @kstachowicz
+/ArmTemplates/      @bmis @kstachowicz
